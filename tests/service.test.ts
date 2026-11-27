@@ -91,6 +91,15 @@ describe("страница статуса", () => {
 
 describe("список модератора", () => {
 
+  it("показывает новые обращения первыми, при равной дате — по убыванию id", () => {
+    const deps = createTestDeps();
+    submit(deps, "Первое");
+    deps.clock.advance(MINUTE);
+    submit(deps, "Второе");
+    submit(deps, "Третье");
+    expect(listForModerator(deps).map((r) => r.text)).toEqual(["Третье", "Второе", "Первое"]);
+  });
+
   it("фильтр по статусу", () => {
     const deps = createTestDeps();
     submit(deps, "a");
