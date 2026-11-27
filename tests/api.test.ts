@@ -172,6 +172,11 @@ describe("GET /api/moderator/requests", () => {
 
 describe("PATCH /api/moderator/requests/[id]", () => {
 
+  it("требует вход до проверки параметров изменения", async () => {
+    const response = await patchRequest(makeRequest("/"), routeParams("invalid"));
+    expect(response.status).toBe(401);
+  });
+
   it("с сессией — меняет статус и ответ", async () => {
     const record = await createOne();
     const res = await patchRequest(
