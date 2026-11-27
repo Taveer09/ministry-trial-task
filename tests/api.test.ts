@@ -161,6 +161,19 @@ describe("GET /api/moderator/requests", () => {
     expect(body.requests[0]).toMatchObject({ text: "Видно модератору", room: "Т-101" });
   });
 
+  it("применяет категорию вместе со статусом", async () => {
+    const match = await createOne("Подходящая запись");
+    const otherStatus = await createOne("Уже в работе");
+    db.prepare("UPDATE requests SET status = 'in_progress' WHERE id = ?").run(otherStatus.id);
+    const otherCategory = await createOne("Другая категория");
+    db.prepare("UPDATE requests SET category = 'idea' WHERE id = ?").run(otherCategory.id);
+    const res = await listRequests(makeRequest("/api/moderator/requests?category=tech&status=new", {
+      cookie: validSessionCookie(),
+    }));
+    expect(res.status).toBe(200);
+    expect((await res.json()).requests).toEqual([expect.objectContaining({ id: match.id })]);
+  });
+
   it("фильтр по статусу и 400 на неизвестный", async () => {
     await createOne();
     const cookie = validSessionCookie();

@@ -106,9 +106,18 @@ export function deviceTimestampsSince(db: Db, deviceId: string, since: number): 
   return rows.map((r) => r.created_at);
 }
 
-export function listRequests(db: Db, status?: Status): RequestRecord[] {
-  const where = status ? "WHERE status = ?" : "";
-  const params = status ? [status] : [];
+export function listRequests(db: Db, status?: Status, category?: Category): RequestRecord[] {
+  const conditions: string[] = [];
+  const params: string[] = [];
+  if (status) {
+    conditions.push("status = ?");
+    params.push(status);
+  }
+  if (category) {
+    conditions.push("category = ?");
+    params.push(category);
+  }
+  const where = conditions.length ? "WHERE " + conditions.join(" AND ") : "";
   const rows = db
     .prepare(`SELECT * FROM requests ${where} ORDER BY created_at ASC, id ASC`)
     .all(...params) as unknown as RequestRow[];

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api-client";
-import { STATUSES, STATUS_LABELS, type Status } from "@/lib/constants";
+import { CATEGORIES, CATEGORY_LABELS, STATUSES, STATUS_LABELS, type Category, type Status } from "@/lib/constants";
 import type { ModeratorRequestView } from "@/lib/service";
 import RequestCard from "./RequestCard";
 import { Card, ErrorMessage, secondaryButtonClass } from "./ui";
@@ -15,6 +15,7 @@ const FILTERS: Filter[] = ["all", ...STATUSES];
 export default function ModeratorDashboard() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
+  const [category, setCategory] = useState<Category | "all">("all");
   const [reloadKey, setReloadKey] = useState(0);
   const [requests, setRequests] = useState<ModeratorRequestView[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,10 @@ export default function ModeratorDashboard() {
 
   useEffect(() => {
     let cancelled = false;
-    const query = filter === "all" ? "" : `?status=${filter}`;
+    const params = new URLSearchParams();
+    if (filter !== "all") params.set("status", filter);
+    if (category !== "all") params.set("category", category);
+    const query = params.size ? `?${params}` : "";
     apiFetch<{ requests: ModeratorRequestView[] }>(`/api/moderator/requests${query}`).then(
       (result) => {
         if (cancelled) return;
@@ -42,7 +46,7 @@ export default function ModeratorDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [filter, reloadKey, router]);
+  }, [filter, category, reloadKey, router]);
 
   function changeFilter(next: Filter) {
     if (next === filter) return;
@@ -94,6 +98,23 @@ export default function ModeratorDashboard() {
           ))}
         </div>
       </div>
+
+      <label className="flex items-center gap-2">
+        Категория
+        <select
+          className="rounded-lg border border-slate-300 px-3 py-2"
+          value={category}
+          onChange={(event) => {
+            setLoading(true);
+            setCategory(event.target.value as Category | "all");
+          }}
+        >
+          <option value="all">Все категории</option>
+          {CATEGORIES.map((value) => (
+            <option key={value} value={value}>{CATEGORY_LABELS[value]}</option>
+          ))}
+        </select>
+      </label>
 
       <ErrorMessage message={error} />
 
