@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getServiceDeps, internalError, jsonError, readJson } from "@/lib/http";
+import { getServiceDeps, internalError, jsonError, readJson, requireModerator } from "@/lib/http";
 import { updateByModerator } from "@/lib/service";
 
 const ERROR_STATUS: Record<string, number> = {
@@ -15,6 +15,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const denied = requireModerator(request);
+    if (denied) return denied;
+
     const { id: rawId } = await params;
     const id = Number(rawId);
     if (!Number.isSafeInteger(id) || id <= 0) {
