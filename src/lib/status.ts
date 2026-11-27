@@ -23,7 +23,7 @@ export function isFinalStatus(status: Status): boolean {
 
 export function isValidRejectionReason(reason: string | null | undefined): boolean {
   if (typeof reason !== "string") return false;
-  return reason.length > 0;
+  return reason.trim().length > 0;
 }
 
 export interface ModeratedFields {

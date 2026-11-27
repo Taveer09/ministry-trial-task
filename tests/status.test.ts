@@ -83,6 +83,13 @@ describe("applyModeratorUpdate", () => {
     expect(result).toMatchObject({ ok: false, code: "invalid_transition" });
   });
 
+  it("отклонение с причиной из пробельных символов — reason_required", () => {
+    expect(applyModeratorUpdate(fields("new"), {
+      status: "rejected",
+      rejectionReason: "  \t  ",
+    })).toMatchObject({ ok: false, code: "reason_required" });
+  });
+
   it("отклонение без причины — reason_required", () => {
     expect(applyModeratorUpdate(fields("new"), { status: "rejected" })).toMatchObject({
       ok: false,
