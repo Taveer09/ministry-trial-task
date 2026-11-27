@@ -110,7 +110,7 @@ export function listRequests(db: Db, status?: Status): RequestRecord[] {
   const where = status ? "WHERE status = ?" : "";
   const params = status ? [status] : [];
   const rows = db
-    .prepare(`SELECT * FROM requests ${where} ORDER BY created_at ASC, id ASC`)
+    .prepare(`SELECT * FROM requests ${where} ORDER BY created_at DESC, id DESC`)
     .all(...params) as unknown as RequestRow[];
   return rows.map(toRecord);
 }
