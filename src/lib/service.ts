@@ -117,8 +117,8 @@ export function getPublicStatus(deps: ServiceDeps, rawCode: string): StatusLooku
   return { ok: true, view: toPublicView(record) };
 }
 
-export function listForModerator(deps: ServiceDeps, status?: Status): ModeratorRequestView[] {
-  return listRequests(deps.db, status).map(toModeratorView);
+export function listForModerator(deps: ServiceDeps, status?: Status, category?: Category): ModeratorRequestView[] {
+  return listRequests(deps.db, status, category).map(toModeratorView);
 }
 
 export type ModeratorUpdateResult =

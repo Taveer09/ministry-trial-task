@@ -51,6 +51,7 @@ export const loginSchema = z.object({
   password: z.string().min(1, { error: "Введите пароль" }).max(200),
 });
 
+export const categoryFilterSchema = z.enum(CATEGORIES).optional();
 export const statusFilterSchema = z.enum(STATUSES).optional();
 
 /** Первое сообщение об ошибке zod в виде строки для ответа API. */
